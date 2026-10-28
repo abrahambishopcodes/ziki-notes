@@ -1,26 +1,299 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Ziki design tokens, taken from the product screenshots in ../ziki-designs */
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-face), ui-monospace, monospace;
+
+  --color-page: #f4f5fa;
+  --color-surface: #ffffff;
+  --color-line: #e8e9ef;
+  --color-line-strong: #dcdee6;
+  --color-chip: #eff0f5;
+
+  --color-ink: #111322;
+  --color-ink-2: #2f3344;
+  --color-muted: #646a7d;
+  --color-subtle: #9aa0b1;
+
+  --color-brand: #4f46e5;
+  --color-brand-hover: #4338ca;
+  --color-brand-soft: #eef0fd;
+  --color-brand-ring: #c7cbf8;
+
+  --color-success: #15a34a;
+  --color-success-soft: #e8f7ee;
+  --color-danger: #dc2626;
+  --color-danger-soft: #fdecec;
+  --color-warning: #c27c0e;
+  --color-warning-soft: #fdf4e3;
+  --color-warning-ring: #f2d48a;
+
+  --color-points: #fdf5c4;
+  --color-points-ink: #7a5a00;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  body {
+    background: var(--color-page);
+    color: var(--color-ink);
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  ::selection {
+    background: var(--color-brand-soft);
+    color: var(--color-ink);
+  }
+
+  textarea,
+  input {
+    caret-color: var(--color-brand);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-ring);
+    outline-offset: 2px;
+    border-radius: 6px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* A note you just wrote keeps a brief ink wash */
+@keyframes note-ink {
+  from {
+    background-color: var(--color-brand-soft);
+  }
+}
+
+.note-fresh > button {
+  border-radius: 6px;
+  animation: note-ink 1600ms cubic-bezier(0.16, 1, 0.3, 1) 200ms backwards;
+}
+
+/* The draft moving down onto the pad; the rest of the page holds still */
+::view-transition-group(*) {
+  animation-duration: 420ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+/* Pen strike: one line drawn across the title, left to right, line after line */
+.strike {
+  background-image: linear-gradient(var(--color-ink-2), var(--color-ink-2));
+  background-repeat: no-repeat;
+  background-position: 0 58%;
+  background-size: 0% 1.5px;
+  transition: background-size 520ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.strike.is-struck {
+  background-size: 100% 1.5px;
+}
+
+/* Let the strike run through inline code instead of under its chip */
+.strike code {
+  transition: background-color 200ms ease-out;
+}
+
+.strike.is-struck code {
+  background-color: transparent;
+}
+
+/* A rejected note keeps the creases from being crumpled; Undo irons them out */
+.note-paper::before {
+  content: "";
+  position: absolute;
+  inset: -6px -10px;
+  border-radius: 8px;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    linear-gradient(112deg, transparent 47.6%, rgba(17, 19, 34, 0.07) 48%, rgba(255, 255, 255, 0.9) 48.4%, transparent 49%),
+    linear-gradient(24deg, transparent 61.6%, rgba(17, 19, 34, 0.06) 62%, rgba(255, 255, 255, 0.9) 62.4%, transparent 63%),
+    linear-gradient(160deg, transparent 29.6%, rgba(17, 19, 34, 0.05) 30%, transparent 30.6%),
+    radial-gradient(ellipse at 30% 40%, rgba(17, 19, 34, 0.025), transparent 60%);
+  transition: opacity 500ms ease-out;
+}
+
+.note-paper.creased::before {
+  opacity: 1;
+  transition-delay: 1500ms;
+}
+
+/* Approval lands like an ink stamp, with a ring of ink spreading out */
+@keyframes stamp-press {
+  0% {
+    opacity: 0;
+    transform: scale(1.8) rotate(-12deg);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(0.9) rotate(-2deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+
+@keyframes stamp-ring {
+  0% {
+    opacity: 0.45;
+    transform: scale(0.6);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+.stamp {
+  animation: stamp-press 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stamp::after {
+  content: "";
+  position: absolute;
+  inset: -4px -8px;
+  border: 1.5px solid currentColor;
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+  animation: stamp-ring 520ms ease-out 170ms;
+}
+
+/* Vote counts roll up; the thumb pops */
+@keyframes roll-in {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+.roll-in {
+  animation: roll-in 360ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes pop {
+  40% {
+    transform: scale(1.35) rotate(-8deg);
+  }
+}
+
+.pop {
+  animation: pop 380ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Vote bar segments grow out from where they meet */
+@keyframes bar-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.bar-grow {
+  animation: bar-grow 620ms cubic-bezier(0.16, 1, 0.3, 1) 120ms backwards;
+}
+
+/* Vote reasons arrive one after another */
+@keyframes vote-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.vote-in {
+  animation: vote-in 320ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+/* Votes dialog rises in; the backdrop fades */
+.votes-dialog[open] {
+  animation: dialog-in 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.votes-dialog[open]::backdrop {
+  animation: backdrop-in 260ms ease-out;
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* "Agent is voting" on a note, ahead of their vote landing */
+@keyframes voting-in {
+  from {
+    opacity: 0;
+    transform: translateX(-4px);
+  }
+}
+
+.voting-in {
+  animation: voting-in 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.typing-dots {
+  display: inline-flex;
+  gap: 2px;
+  margin-left: 1px;
+}
+
+.typing-dots span {
+  width: 3px;
+  height: 3px;
+  border-radius: 999px;
+  background: currentColor;
+  animation: typing-dot 1s ease-in-out infinite;
+}
+
+.typing-dots span:nth-child(2) {
+  animation-delay: 160ms;
+}
+
+.typing-dots span:nth-child(3) {
+  animation-delay: 320ms;
+}
+
+@keyframes typing-dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .votes-dialog[open],
+  .votes-dialog[open]::backdrop,
+  .note-fresh > button,
+  .stamp,
+  .stamp::after,
+  .roll-in,
+  .pop,
+  .bar-grow,
+  .vote-in,
+  .voting-in,
+  .typing-dots span,
+  ::view-transition-group(*) {
+    animation: none;
+  }
+
+  .strike {
+    transition: none;
+  }
 }

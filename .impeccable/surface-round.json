@@ -1,0 +1,60 @@
+{
+  "title": "Choose the notepad's structure",
+  "question": "Same ziki look for all three. Pick how the notepad is laid out, or steer / re-roll.",
+  "options": [
+    {
+      "id": "divider-tabs",
+      "label": "Tabbed notebook",
+      "kicker": "THE ROLL",
+      "thesis": "One ruled notepad split into sections by kind, with divider tabs sticking out of its edge: Do, Don't, Gotcha, Convention.",
+      "palette": ["#f4f5fa", "#ffffff", "#4f46e5", "#15a34a", "#dc2626", "#c27c0e"],
+      "materials": ["ruled sheet", "divider tabs", "margin notes"],
+      "viewport": "A white pad sheet in the panel with faint ruled lines and a left margin rule. Coloured divider tabs run down the right edge. Each section heading sits on the rule and its notes are written beneath, with author/model and linked issues as small margin marks on the left. A blank top line says 'Jot a note…'.",
+      "risk": "The tabs could read as filters if they look like buttons rather than paper.",
+      "wireframe": {"cols": 12, "rows": 10, "regions": [
+        {"label": "breadcrumb", "x": 0, "y": 0, "w": 12, "h": 1},
+        {"label": "margin", "x": 0, "y": 1, "w": 2, "h": 9},
+        {"label": "write line", "x": 2, "y": 1, "w": 9, "h": 1, "accent": true},
+        {"label": "Do section", "x": 2, "y": 2, "w": 9, "h": 3},
+        {"label": "Don't section", "x": 2, "y": 5, "w": 9, "h": 3},
+        {"label": "Gotcha…", "x": 2, "y": 8, "w": 9, "h": 2},
+        {"label": "tabs", "x": 11, "y": 1, "w": 1, "h": 9, "accent": true}
+      ]}
+    },
+    {
+      "id": "ledger",
+      "label": "Do / Don't ledger",
+      "thesis": "The pad as a T-chart: Do's on the left page and Don'ts on the right, with gotchas and conventions written across the foot of the spread.",
+      "palette": ["#f4f5fa", "#ffffff", "#4f46e5", "#15a34a", "#dc2626"],
+      "materials": ["two-page spread", "centre fold", "ruled lines"],
+      "viewport": "An open two-page notepad. A spine line runs down the middle, headed 'Do' and 'Don't'. Notes are jotted as lines with a small author mark, and a wide strip at the bottom holds Gotchas and Conventions. Each column has its own write-in line.",
+      "risk": "Columns end up uneven, and on mobile it collapses into a single stack.",
+      "wireframe": {"cols": 12, "rows": 10, "regions": [
+        {"label": "breadcrumb", "x": 0, "y": 0, "w": 12, "h": 1},
+        {"label": "Do page", "x": 0, "y": 1, "w": 6, "h": 6, "accent": true},
+        {"label": "Don't page", "x": 6, "y": 1, "w": 6, "h": 6},
+        {"label": "Gotchas & conventions", "x": 0, "y": 7, "w": 12, "h": 3}
+      ]}
+    },
+    {
+      "id": "journal",
+      "label": "Dated running pad",
+      "thesis": "A single running notepad, newest on top, with dates in the margin. You write on the top line, the way you'd keep a lab notebook.",
+      "palette": ["#f4f5fa", "#ffffff", "#4f46e5", "#646a7d"],
+      "materials": ["continuous sheet", "date margin", "inline kind marks"],
+      "viewport": "One tall white sheet. The top line is today's open line with a blinking caret. Below it, notes run as paragraphs, with 'Today', 'Yesterday' and '26 Oct' set in the left margin. Each note starts with a small coloured kind mark (Do/Don't/Gotcha) and ends in a quiet byline: Mr. Bean · Opus 5.5 · #13 #71.",
+      "risk": "A note that's still important gets buried as newer ones pile up on top.",
+      "wireframe": {"cols": 12, "rows": 10, "regions": [
+        {"label": "breadcrumb", "x": 0, "y": 0, "w": 12, "h": 1},
+        {"label": "date margin", "x": 0, "y": 1, "w": 2, "h": 9},
+        {"label": "today: write line", "x": 2, "y": 1, "w": 10, "h": 1, "accent": true},
+        {"label": "today's notes", "x": 2, "y": 2, "w": 10, "h": 3},
+        {"label": "yesterday", "x": 2, "y": 5, "w": 10, "h": 3},
+        {"label": "earlier", "x": 2, "y": 8, "w": 10, "h": 2}
+      ]}
+    }
+  ],
+  "reroll": true,
+  "steer": true,
+  "buildPath": {"value": "code", "toggle": false}
+}
