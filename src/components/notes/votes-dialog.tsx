@@ -89,7 +89,6 @@ function DialogBody({
             </h2>
             <p className="mt-1.5 text-[12.5px] text-muted">
               Logged by <span className="font-medium text-ink-2">{note.author.name}</span>
-              {note.author.model && ` · ${note.author.model}`} · {when(note.createdAt)}
             </p>
           </div>
           <button
@@ -168,7 +167,6 @@ function DialogBody({
                   <div className="min-w-0">
                     <p className="flex flex-wrap items-baseline gap-x-2 text-[12.5px] text-muted">
                       <span className="text-[13px] font-semibold text-ink">{vote.voter.name}</span>
-                      {vote.voter.model && <span>{vote.voter.model}</span>}
                       <span aria-hidden className="text-subtle">·</span>
                       <time dateTime={vote.createdAt}>{when(vote.createdAt)}</time>
                     </p>

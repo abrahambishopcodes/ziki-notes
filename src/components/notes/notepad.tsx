@@ -8,7 +8,6 @@ import { Composer, type Draft } from "./composer";
 import { crumple, flyToHeader } from "./choreography";
 import { reducedMotion, RollingCount } from "./motion";
 import { NoteEntry } from "./note-entry";
-import { dayOf } from "./note-meta";
 import { VotesDialog } from "./votes-dialog";
 
 const PROJECT = "Zedu";
@@ -19,15 +18,6 @@ function splitNote(text: string) {
   const lead = first.match(/^(.+?[.!?])\s+(.+)$/);
   if (lead) return { title: lead[1], body: [lead[2], ...rest].join(" ").trim() };
   return { title: first, body: rest.join(" ").trim() };
-}
-
-function Margin({ label, date }: { label: string; date: string }) {
-  return (
-    <div className="sm:sticky sm:top-[92px] sm:self-start sm:text-right">
-      <p className="text-[13px] font-semibold text-ink">{label}</p>
-      <p className="mt-0.5 text-[12px] text-muted">{date}</p>
-    </div>
-  );
 }
 
 export function Notepad({ initialNotes }: { initialNotes: Note[] }) {
@@ -70,21 +60,9 @@ export function Notepad({ initialNotes }: { initialNotes: Note[] }) {
     return () => clearTimeout(timer);
   }, []);
 
-  const days = useMemo(() => {
-    const sorted = [...notes].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-    const groups = new Map<number, { label: string; date: string; notes: Note[] }>();
-    for (const note of sorted) {
-      const d = dayOf(note.createdAt);
-      if (!groups.has(d.key)) groups.set(d.key, { label: d.label, date: d.date, notes: [] });
-      groups.get(d.key)!.notes.push(note);
-    }
-    return [...groups.values()];
-  }, [notes]);
+  const sorted = useMemo(() => [...notes].sort((a, b) => b.createdAt.localeCompare(a.createdAt)), [notes]);
 
   const writers = new Set(notes.map((n) => n.author.name)).size;
-  const today = dayOf(new Date(NOW).toISOString());
-  const hasToday = days[0]?.label === "Today";
-  const [first, ...earlier] = hasToday ? days : [{ ...today, notes: [] as Note[] }, ...days];
 
   const add = (text: string, type: NoteType, draft: Draft) => {
     const id = Math.max(0, ...notes.map((n) => n.id)) + 1;
@@ -95,8 +73,6 @@ export function Notepad({ initialNotes }: { initialNotes: Note[] }) {
       platforms: [],
       roles: [],
       tags: [],
-      linkedIssues: [],
-      linkedPrs: [],
       author: currentUser,
       votes: [],
       review: "pending",
@@ -165,35 +141,28 @@ export function Notepad({ initialNotes }: { initialNotes: Note[] }) {
         </p>
       </header>
 
-      <div className="mx-auto max-w-[880px] px-4 pb-10 md:px-6">
-        {[first, ...earlier].map((day, i) => (
-          <div
-            key={day.label + day.date}
-            className={`grid gap-x-10 gap-y-5 py-8 sm:grid-cols-[112px_1fr] ${i > 0 ? "border-t border-line" : ""}`}
-          >
-            <Margin label={day.label} date={day.date} />
-            {/* Left padding is the gutter the kind marks hang in */}
-            <div className="max-w-[68ch] space-y-6 border-line pl-7 sm:border-l sm:pl-10">
-              {i === 0 && <Composer project={PROJECT} onAdd={add} />}
-              {day.notes.map((note) => (
-                <NoteEntry
-                  key={note.id}
-                  note={note}
-                  fresh={note.id === freshId}
-                  stamp={stampFor(note.id)}
-                  voter={voting?.noteId === note.id ? voting.voter : undefined}
-                  onOpenVotes={() => setVotesFor(note.id)}
-                  onReview={(value) => review(note.id, value)}
-                />
-              ))}
-              {i === 0 && day.notes.length === 0 && (
-                <p className="text-[14px] text-muted">
-                  Nothing written today yet. Agents add notes here when they spot something worth remembering.
-                </p>
-              )}
-            </div>
-          </div>
-        ))}
+      <div className="mx-auto max-w-[720px] px-4 pb-10 md:px-6">
+        <p className="mt-6 rounded-xl border border-line bg-chip/60 px-4 py-3 text-[13.5px] leading-[1.6] text-ink-2">
+          <span className="font-semibold text-ink">Try it:</span> approve or reject a note to see the whimsical
+          animation, and type in the note box below to see the pen animation as well. Click{" "}
+          <span className="font-medium text-brand">See why</span> on any note to read why each agent upvoted or
+          downvoted it.
+        </p>
+        {/* Left padding is the gutter the kind marks hang in */}
+        <div className="space-y-6 py-8 pl-7">
+          <Composer project={PROJECT} onAdd={add} />
+          {sorted.map((note) => (
+            <NoteEntry
+              key={note.id}
+              note={note}
+              fresh={note.id === freshId}
+              stamp={stampFor(note.id)}
+              voter={voting?.noteId === note.id ? voting.voter : undefined}
+              onOpenVotes={() => setVotesFor(note.id)}
+              onReview={(value) => review(note.id, value)}
+            />
+          ))}
+        </div>
       </div>
 
       <VotesDialog

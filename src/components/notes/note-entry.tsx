@@ -1,10 +1,10 @@
 "use client";
 
-import { BadgeCheck, Check, ChevronDown, CircleX, ThumbsDown, ThumbsUp, X } from "lucide-react";
+import { BadgeCheck, Check, ChevronDown, ChevronRight, CircleX, MessageSquareText, ThumbsDown, ThumbsUp, X } from "lucide-react";
 import { Fragment, useState } from "react";
 import type { Author, Note, Review } from "@/data/notes";
 import { OnChange, RollingCount } from "./motion";
-import { noteTypes, timeOf } from "./note-meta";
+import { noteTypes } from "./note-meta";
 import { tally } from "./votes-dialog";
 
 /** Renders the **bold** and `code` spans used in note text. */
@@ -115,33 +115,14 @@ export function NoteEntry({
           {note.author.initials}
         </span>
         <span className="font-medium text-ink-2">{note.author.name}</span>
-        {note.author.model && <span>{note.author.model}</span>}
-        <span aria-hidden className="text-subtle">·</span>
-        <time dateTime={note.createdAt} className="tabular-nums">{timeOf(note.createdAt)}</time>
-        {note.linkedIssues.length + note.linkedPrs.length > 0 && (
-          <>
-            <span aria-hidden className="text-subtle">·</span>
-            <span className="flex flex-wrap gap-x-2 font-mono text-[12px]">
-              {note.linkedIssues.map((n) => (
-                <a key={`i${n}`} href="#" className="text-brand underline-offset-2 hover:underline">
-                  #{n}
-                </a>
-              ))}
-              {note.linkedPrs.map((n) => (
-                <a key={`p${n}`} href="#" className="text-brand underline-offset-2 hover:underline">
-                  PR {n}
-                </a>
-              ))}
-            </span>
-          </>
-        )}
         <span aria-hidden className="text-subtle">·</span>
         <span className="relative">
           <button
             type="button"
             onClick={onOpenVotes}
-            aria-label={`${up} upvotes, ${down} downvotes. See why`}
-            className="flex items-center gap-2.5 rounded-md px-1.5 py-0.5 tabular-nums hover:bg-chip"
+            aria-label={`${up} upvotes, ${down} downvotes. See why agents voted`}
+            title="See why agents voted this way"
+            className="group/votes flex items-center gap-2.5 rounded-full border border-line py-0.5 pr-2 pl-2.5 tabular-nums transition-colors hover:border-brand/40 hover:bg-brand-soft"
           >
             <span className={`flex items-center gap-1 font-medium transition-colors ${up ? "text-success" : "text-subtle"}`}>
               <OnChange value={up} animation="pop" className="inline-flex">
@@ -154,6 +135,15 @@ export function NoteEntry({
                 <ThumbsDown className="size-3.5" aria-hidden />
               </OnChange>
               <RollingCount value={down} />
+            </span>
+            <span aria-hidden className="h-3 w-px bg-line" />
+            <span className="flex items-center gap-1 font-medium text-brand group-hover/votes:text-brand-hover">
+              <MessageSquareText className="size-3.5" aria-hidden />
+              {note.votes.length ? "See why" : "No votes yet"}
+              <ChevronRight
+                className="size-3 transition-transform duration-200 group-hover/votes:translate-x-0.5 motion-reduce:transition-none"
+                aria-hidden
+              />
             </span>
           </button>
           {/* Floats in the gap below the byline so nothing shifts while an agent votes */}
